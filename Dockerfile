@@ -1,6 +1,6 @@
-FROM quay.io/aptible/ubuntu:16.04
+FROM debian:stretch
 
-RUN apt-get update && apt-get install -y \
+RUN apt update && apt install -y \
         autoconf \
         bioperl \
         build-essential \
@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
         liblzma-dev \
         libxml-simple-perl \
         libz-dev \
+        locales \
         pigz \
         python \
         python-dev \
@@ -22,7 +23,7 @@ RUN apt-get update && apt-get install -y \
         python3-pip \
         unzip \
         wget \
-        && apt-get clean
+        && rm -rf /var/lib/apt
 
 # Install CheckM
 
@@ -32,7 +33,7 @@ RUN wget "https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01
 
 RUN mkdir -p /opt/checkm; mv checkm_data_2015_01_16.tar.gz /opt/checkm/ && tar -xzf /opt/checkm/checkm_data_2015_01_16.tar.gz
 
-RUN checkm data setRoot /opt/checkm
+RUN echo -e "cat << EOF\n/opt/checkm\nEOF\n" | checkm data setRoot
 
 # Install cutadapt
 

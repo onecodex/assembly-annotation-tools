@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
         libz-dev \
         locales \
         pigz \
+        pkg-config \
         python \
         python-dev \
         python-pip \

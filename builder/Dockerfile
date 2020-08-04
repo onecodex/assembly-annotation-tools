@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y \
         default-jre \
         git \
         libbz2-dev \
+        libcurl-dev \
         liblzma-dev \
+        libssl-dev \
         libz-dev \
         locales \
         pigz \

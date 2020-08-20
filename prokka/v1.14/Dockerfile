@@ -53,5 +53,3 @@ RUN git clone https://github.com/tseemann/prokka.git /usr/local/prokka && \
     git checkout v${PROKKA_VERSION}
 
 ENV PATH $PATH:/usr/local/prokka/bin
-
-RUN prokka --setupdb

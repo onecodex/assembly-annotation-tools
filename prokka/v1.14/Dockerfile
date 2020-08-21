@@ -3,8 +3,6 @@ FROM debian:buster-slim
 RUN apt-get update && \
     apt-get install -y \
       bioperl \
-      libfaketime \
-      libidn11 \
       wget \
       build-essential \
     && \
@@ -39,14 +37,7 @@ RUN wget "https://ftp.ncbi.nih.gov/toolbox/ncbi_tools/converters/by_program/tbl2
     chmod +x linux64.tbl2asn && \
     mv linux64.tbl2asn /usr/local/bin/tbl2asn
 
-# prevent tbl2asn from expiring
-# (see https://github.com/audy/tbl2asn-forever)
-RUN echo 'set -euo pipefail LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1 FAKETIME="2019-01-01 00:00:01" /usr/bin/real-tbl2asn $*' \
-  > /usr/local/bin/tbl2asn \
-  && chmod +x /usr/local/bin/tbl2asn
-
 # Install HMMER
-
 ENV HMMER_VERSION 3.2.1
 
 RUN wget "http://eddylab.org/software/hmmer/hmmer-3.2.1.tar.gz" && \

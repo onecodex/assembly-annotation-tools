@@ -5,16 +5,39 @@ RUN apt-get update && \
       bioperl \
       libfaketime \
       libidn11 \
+      wget \
+      build-essential \
     && \
     rm -rf /var/lib/apt
 
 LABEL software.version="v1.14.0"
 
-COPY --from=quay.io/refgenomics/aragorn:1.2.38 /usr/local/bin/aragorn /usr/local/bin/
+# Install aragorn
 
-COPY --from=quay.io/refgenomics/prodigal:2.6.3 /usr/local/bin/prodigal /usr/local/bin/
+ENV ARAGORN_VERSION 1.2.38
 
-COPY --from=quay.io/refgenomics/tbl2asn:latest /usr/local/bin/tbl2asn /usr/local/bin/real-tbl2asn
+RUN wget "http://mbioserv2.mbioekol.lu.se/ARAGORN/Downloads/aragorn${ARAGORN_VERSION}.tgz" && \
+    tar -xzvf aragorn${ARAGORN_VERSION}.tgz && \
+    cd aragorn${ARAGORN_VERSION} && \
+    gcc -O3 -ffast-math -finline-functions -o aragorn aragorn${ARAGORN_VERSION}.c && \
+    chmod +x aragorn && \
+    mv aragorn /usr/local/bin/ && \
+    cd / && \
+    rm -r aragorn*
+
+# Install Prodigal
+
+ENV PRODIGAL_VERSION 2.6.3
+
+RUN wget "https://github.com/hyattpd/Prodigal/releases/download/v${PRODIGAL_VERSION}/prodigal.linux" && \
+    chmod +x prodigal.linux && \
+    mv prodigal.linux /usr/local/bin/prodigal
+
+# Install tbl2asn
+RUN wget "https://ftp.ncbi.nih.gov/toolbox/ncbi_tools/converters/by_program/tbl2asn/linux64.tbl2asn.gz" && \
+    gunzip linux64.tbl2asn.gz && \
+    chmod +x linux64.tbl2asn && \
+    mv linux64.tbl2asn /usr/local/bin/tbl2asn
 
 # prevent tbl2asn from expiring
 # (see https://github.com/audy/tbl2asn-forever)
@@ -22,7 +45,18 @@ RUN echo 'set -euo pipefail LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfak
   > /usr/local/bin/tbl2asn \
   && chmod +x /usr/local/bin/tbl2asn
 
-COPY --from=quay.io/refgenomics/hmmer:3.2.1 /usr/local/bin/* /usr/local/bin/
+# Install HMMER
+
+ENV HMMER_VERSION 3.2.1
+
+RUN wget "http://eddylab.org/software/hmmer/hmmer-3.2.1.tar.gz" && \
+    tar -zxf hmmer-3.2.1.tar.gz && \
+    cd hmmer-${HMMER_VERSION} && \
+    ./configure --prefix /usr/local && \
+    make && \
+    make install && \
+    cd / && \
+    rm -r hmmer*
 
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
 RUN mkdir -p /usr/share/man/man1
